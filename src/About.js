@@ -1,8 +1,9 @@
-export default function About(props){
-    console.log("It's Home");
-    return(
+import { Typography } from "@mui/material";
+export default function About(props) {
+    console.log("It's About");
+    return (
         <>
-         This is the {props.name} Page.
+            <Typography variant='h5'> {props.name} Page.</Typography>
         </>
     );
 }

@@ -9,14 +9,13 @@ import './App.css';
 function App() {
   return (
     <>
-      Hi i am here
-      <Myfunction name="Nishit" city="Anand" />
       <Router>
         <Navbar />
         <Routes>
           <Route exact path="/" element={<Home name="Home"/>}></Route> 
           <Route path="/about" element={<About name="About"/>}></Route> 
         </Routes>
+      <Myfunction name="Nishit" city="Anand" />
       </Router>
     </>
   );

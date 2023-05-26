@@ -15,7 +15,7 @@ import { CartWrapper } from "./context/cart";
 const App = () => {
   return (
     <ThemeProvider theme={theme}>
-      <React.Suspense fallback={<></>}>
+      <React.Suspense fallback={<></>} >
         <BrowserRouter>
           <AuthWrapper>
             <CartWrapper>

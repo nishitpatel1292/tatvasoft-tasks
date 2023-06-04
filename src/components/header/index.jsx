@@ -1,32 +1,37 @@
 import React, { useMemo, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { headerStyle } from "./style";
-import cartIcon from "../../assets/images/cart.png";
 import List from "@material-ui/core/List";
 import AppBar from "@material-ui/core/AppBar";
-
 import ListItem from "@material-ui/core/ListItem";
 import siteLogo from "../../assets/images/site-logo.svg";
-
+import cartIcon from "../../assets/images/cart.png";
 import searchIcon from "../../assets/images/search.png";
 import { TextField, Button } from "@material-ui/core";
 import Shared from "../../utils/shared";
 import { useAuthContext } from "../../context/auth";
 import { RoutePaths } from "../../utils/enum";
-
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import bookService from "../../service/book.service";
-
+import { useCartContext } from "../../context/cart";
 
 const Header = () => {
   const classes = headerStyle();
   const authContext = useAuthContext();
+  const cartContext = useCartContext();
+  // const [open, setOpen] = useState(false);
   const open = false;
   const [query, setquery] = useState("");
-  const [openSearchResult, setOpenSearchResult] = useState(false);
   const [bookList, setbookList] = useState([]);
+  const [openSearchResult, setOpenSearchResult] = useState(false);
 
+  const navigate = useNavigate();
 
-
+  // for mobile menu
+  const openMenu = () => {
+    document.body.classList.toggle("open-menu");
+  };
 
   const items = useMemo(() => {
     return Shared.NavigationItems.filter(
@@ -35,7 +40,10 @@ const Header = () => {
     );
   }, [authContext.user]);
 
- 
+  const logOut = () => {
+    authContext.signOut();
+    cartContext.emptyCart();
+  };
 
   const getBooks = async () => {
     const res = await bookService.getAll({
@@ -52,7 +60,21 @@ const Header = () => {
     setOpenSearchResult(true);
   };
 
-
+  const addToCart = (book) => {
+    if (!authContext.user.id) {
+      navigate(RoutePaths.Login);
+      toast.error("Please login before adding books to cart");
+    } else {
+      Shared.addToCart(book, authContext.user.id).then((res) => {
+        if (res.error) {
+          toast.error(res.message);
+        } else {
+          toast.success(res.message);
+          cartContext.updateCart();
+        }
+      });
+    }
+  };
 
   return (
     <div className={classes.headerWrapper}>
@@ -95,17 +117,25 @@ const Header = () => {
                     ))}
                   </List>
                   <List className="cart-country-wrap">
-                  <ListItem className="cart-link">
+                    <ListItem className="cart-link">
                       <Link to="/cart" title="Cart">
                         <img src={cartIcon} alt="cart.png" />
+                        <span>{cartContext.cartData.totalRecords}</span>
                         Cart
                       </Link>
                     </ListItem>
-                    <ListItem className="hamburger">
+                    <ListItem className="hamburger" onClick={openMenu}>
                       <span></span>
                     </ListItem>
                   </List>
 
+                  {authContext.user.id && (
+                    <List className="right">
+                      <Button onClick={() => logOut()} variant="outlined">
+                        Log out
+                      </Button>
+                    </List>
+                  )}
                 </div>
               </div>
             </div>
@@ -154,7 +184,9 @@ const Header = () => {
                                       <span className="price">
                                         {item.price}
                                       </span>
-
+                                      <Link onClick={() => addToCart(item)}>
+                                        Add to cart
+                                      </Link>
                                     </div>
                                   </div>
                                 </ListItem>

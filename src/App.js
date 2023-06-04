@@ -9,16 +9,19 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import MainNavigation from "./components/MainNavigation";
 import { AuthWrapper } from "./context/auth";
-
+import loader from "../src/assets/images/loader.gif";
 import { CartWrapper } from "./context/cart";
 
 const App = () => {
   return (
     <ThemeProvider theme={theme}>
-      <React.Suspense fallback={<></>} >
+      <React.Suspense fallback={<></>}>
         <BrowserRouter>
           <AuthWrapper>
             <CartWrapper>
+              <div className="loader-wrapper">
+                <img src={loader} alt="loader" />
+              </div>
               <div className="wrapper">
                 <Header />
                 <main>
